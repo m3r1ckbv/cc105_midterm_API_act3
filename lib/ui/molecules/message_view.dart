@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../atoms/app_button.dart';
 
-/// Reusable for error and empty states.
 class MessageView extends StatelessWidget {
   final IconData icon;
   final String message;
@@ -25,10 +24,10 @@ class MessageView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 48),
-            const SizedBox(height: 12),
+            const SizedBox(height: 30),
             Text(message, textAlign: TextAlign.center),
             if (actionLabel != null && onAction != null) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: 30),
               AppButton(label: actionLabel!, onPressed: onAction!),
             ],
           ],

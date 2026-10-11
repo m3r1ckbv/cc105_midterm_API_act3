@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import '../../models/currency.dart';
-import '../molecules/currency_card.dart';
+import '../templates/currency_card.dart';
 
 class CurrencyList extends StatelessWidget {
-  final List<Currency> currencies;
-  const CurrencyList({super.key, required this.currencies});
+  final List<CurrencyRate> rates;
+  const CurrencyList({super.key, required this.rates});
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       padding: const EdgeInsets.all(12),
-      itemCount: currencies.length,
-      itemBuilder: (_, i) => CurrencyCard(currency: currencies[i]),
+      itemCount: rates.length,
+      itemBuilder: (_, i) => CurrencyCard(rate: rates[i]),
     );
   }
 }
