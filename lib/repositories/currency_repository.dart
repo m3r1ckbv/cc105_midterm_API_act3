@@ -37,6 +37,8 @@ class CurrencyRepository {
       _catalogCache ??= await _service.fetchCatalog();
 
 Future<List<CurrencyRate>> getRandomMajorCurrencies() async {
+  await Future.delayed(const Duration(seconds: 5));
+
   final catalog = await _catalog();
   final php = await _service.fetchPhpRates();
 
@@ -44,7 +46,7 @@ Future<List<CurrencyRate>> getRandomMajorCurrencies() async {
   for (final c in catalog.currencies) {
     final code = c.code.toLowerCase();
     if (!_majorCodes.contains(code)) continue;
-    final perPhp = php.rates[code]; // 1 PHP = x FOREIGN
+    final perPhp = php.rates[code];
     if (perPhp == null || perPhp <= 0) continue;
     majors.add(CurrencyRate(
       currency: c,
@@ -62,7 +64,6 @@ Future<List<CurrencyRate>> getRandomMajorCurrencies() async {
   return [...phpRate, ...majors.take(10 - phpRate.length)]..shuffle(_random);
 }
 
-  /// One random currency priced in PHP.
   Future<CurrencyRate> _fetchRandomRate() async {
     final catalog = await _catalog();
     final php = await _service.fetchPhpRates();
@@ -77,23 +78,34 @@ Future<List<CurrencyRate>> getRandomMajorCurrencies() async {
     }
 
     final pick = candidates[_random.nextInt(candidates.length)];
-    final phpPerForeign = php.rates[pick.code.toLowerCase()]!; // 1 PHP = x FOREIGN
+    final phpPerForeign = php.rates[pick.code.toLowerCase()]!;
     return CurrencyRate(
       currency: pick,
       phpPerUnit: 1 / phpPerForeign,
       date: php.date,
     );
   }
+
   Stream<RandomCurrencyState> watchRandomCurrency({
-    Duration interval = const Duration(seconds: 5),
+  Duration interval = const Duration(seconds: 5),
+  int failEvery = 4,
   }) async* {
+    var fetchCount = 0;
+
     while (true) {
+      fetchCount++;
       yield const RandomCurrencyLoading();
+      await Future.delayed(const Duration(seconds: 2));
+
       try {
+        if (failEvery > 0 && fetchCount % failEvery == 0) {
+          throw const ApiException('Simulated error: failed to fetch currency.');
+        }
         yield RandomCurrencyData(await _fetchRandomRate());
       } catch (e) {
         yield RandomCurrencyError(e.toString());
       }
+
       await Future.delayed(interval);
     }
   }
