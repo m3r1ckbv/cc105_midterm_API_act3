@@ -39,7 +39,6 @@ class CurrencyApiService {
     } on FormatException {
       throw const ApiException('Received invalid data from the server.');
     } catch (_) {
-      // SocketException / ClientException (airplane mode, no network, etc.)
       throw const ApiException('No connection. Check your internet and retry.');
     }
   }
